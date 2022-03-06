@@ -3,6 +3,8 @@
     "version": "0.0.1",
     "description": "Creating a chat app",
     "dependencies": {
-        "express": "^4.17.3"
+        "express": "^4.17.3",
+        "mongodb": "^4.4.1",
+        "socket.io": "^4.4.1"
     }
 }
