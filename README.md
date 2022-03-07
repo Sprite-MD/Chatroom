@@ -1,6 +1,6 @@
 # Chatroom
 
-Planned chatroom website. Should take in user and allow peer to peer communication.  
+Chatroom website with the backend running on nodeJS and express, using the socketIO library to facilitate bidirectional communication in the chatroom.   
 
 Planned stack:  
 GraphQL  
