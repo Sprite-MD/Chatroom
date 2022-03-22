@@ -3,11 +3,13 @@
     "version": "0.0.1",
     "description": "Creating a chat app",
     "dependencies": {
+        "apollo-server": "^3.6.5",
         "express": "^4.17.3",
+        "graphql": "^16.3.0",
         "mongodb": "^4.4.1",
         "socket.io": "^4.4.1"
     },
-    "scripts":{
+    "scripts": {
         "start": "node index.js"
     }
 }

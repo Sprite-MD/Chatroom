@@ -1,29 +1,37 @@
-const http = require("http");
-const { Server } = require("socket.io");
-const express = require('express');
+const {ApolloServer, gql } = require('apollo-server');
 
-const app = express();
-const HTTPServer = http.createServer(app);
-const ws = new Server(HTTPServer);
+const typeDefs = gql`
+    type Book{
+        title: String
+        author: String
+    }
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    type Query{
+        books: [Book]
+    }
+
+`;
+
+const books = [
+    {
+        title: "Book 1",
+        author: "Kate Chopp",
+    },
+
+    {
+        title: "Book 2", 
+        author: "John Snow",
+    },
+];
+
+const resolvers = {
+    Query: {
+        books: () => books,
+    },
+};
+
+const server = new ApolloServer({typeDefs, resolvers });
+
+server.listen().then(({url}) => {
+    console.log(` Server ready at ${url}`);
 });
-
-ws.on('connection', (socket) => {
-    console.log('a user has connected');
-    socket.on('disconnect', () => {
-        console.log('a user has disconnected');
-    });
-
-    socket.on('Msg to Server', (msg) => {
-        console.log('message: ' + msg);
-        ws.emit('Msg to Client', msg);
-
-    });
-});
-
-HTTPServer.listen(3000, () => {
-    console.log('listening on *:3000');
-});
-
