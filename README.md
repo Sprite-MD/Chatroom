@@ -1,6 +1,6 @@
 ## README
 
-Creating a chatroom using graphql and nodejs for the backend and react for the frontend. Apollo will be used as the server.
+Creating a chatroom using graphql and nodejs for the backend and react for the frontend. Apollo will be used as the graphql server.
 
 # Feature Ideas:  
 User Registration  
