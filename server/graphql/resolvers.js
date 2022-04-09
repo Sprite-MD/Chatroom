@@ -1,19 +1,15 @@
+const { User } = require('../models/user')
+
 module.exports = {
     Query: {
         getUsers: () => {
-            // Dummy users for test
-            const users = [
-                {
-                    username: "john",
-                    email: "john@gmail.com"
-                },
-                {
-                    username: "huy",
-                    email: "huy@gmail.com"
-                },
-            ]
+            try{
+                const users = await User.findAll();
 
-            return users
+                return users;
+            } catch (err){
+                console.log(err);
+            }
         },
     },
 
