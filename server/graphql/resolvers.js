@@ -1,8 +1,8 @@
-const { User } = require('../models/user')
+const { User } = require('../models')
 
 module.exports = {
     Query: {
-        getUsers: () => {
+        getUsers: async () => {
             try{
                 const users = await User.findAll();
 
