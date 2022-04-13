@@ -18,7 +18,7 @@ module.exports = {
     Mutation: {
         register: async (parent, args) => {
             let {username, email, password, confirmPassword} = args;
-            let error = {}
+            let error = {};
 
             try {
 
@@ -30,29 +30,38 @@ module.exports = {
 
                 if (password != confirmPassword) error.confirmPassword = 'Password must match'
 
-                // Check if user/email exists
-                const userByUsername = await User.findOne({ where: { username }});
-                const userByEmail = await User.findOne({ where: { email }});
+                // // Check if user/email exists
+                // const userByUsername = await User.findOne({ where: { username }});
+                // const userByEmail = await User.findOne({ where: { email }});
 
-                if (userByUsername) error.username = "Username is taken";
-                if (userByEmail) error.email = "Email is taken";
+                // if (userByUsername) error.username = "Username is taken";
+                // if (userByEmail) error.email = "Email is taken";
 
                 if (Object.keys(error).length  > 0){
-                    throw error
+                    throw error;
                 };
                 // Hash pass
-                // #3 14:32 npm install bcryptjs -- will do later if neccessary
+                // #3 14:32 npm install bcryptjs -- will do later if neccessary and import
+                // password = await bcrypt.hash(password, 6);
 
                 // Create User
                 const user = await User.create({
-                    username, email, password
+                    username, email, password,
                 });
 
                 // Return User
                 return user;
+
             } catch(err){
                 console.log(err);
-                throw new UserInputError("Bad input", { error: err });
+                if (err.name === 'SequelizeUniqueConstraintError'){
+                    err.errors.forEach( 
+                        (e) => (error[e.path] = `${e.path} is already taken`)
+                    )
+                } else if (err.name === 'SequelizeValidationError'){
+                    err.errors.forEach( (e) => (error[e.path] = e.message))
+                }
+                throw new UserInputError("Bad input", { error });
             }
         }
     }
