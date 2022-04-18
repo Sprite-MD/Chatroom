@@ -20,6 +20,13 @@ module.exports = {
             let errors = {}
 
             try{
+                if (username.trim() === '') errors.username = 'username must not be empty'
+                if (password.trim() === '') errors.password = 'password must not be empty'
+
+                if (Object.keys(errors).length > 0){
+                    throw new UserInputError('bad input', { errors })
+                };
+
                 const user = await User.findOne({
                     where: { username }
                 });
