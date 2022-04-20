@@ -2,16 +2,39 @@ const { formatApolloErrors } = require('apollo-server-errors');
 const { User } = require('../models');
 const {UserInputError, AuthenticationError} = require('apollo-server');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const {JWT_SECRET} = require('../config/env.json')
+const { Op } = require('sequelize');
 
 module.exports = {
     Query: {
-        getUsers: async () => {
+        getUsers: async (parent, args, context) => {
+            
             try{
-                const users = await User.findAll();
+
+                let user;
+
+                if (context.req && context.req.headers.authorization){
+
+                    const token = context.req.headers.authorization.split('Bearer ')[1]
+                    jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
+                        if (err){
+                            throw new AuthenticationError('Unauthenticated')
+                        }
+                        user = decodedToken
+
+                        console.log(user)
+                    })
+                }
+
+                const users = await User.findAll({
+                    where: { username: { [Op.ne]: user.username } },
+                });
 
                 return users;
             } catch (err){
                 console.log(err);
+                throw err;
             }
         },
 
@@ -42,7 +65,14 @@ module.exports = {
                     throw new AuthenticationError('Password is incorrect', {errors})
                 }
 
-                return user
+                const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '1h' });
+
+                return {
+                    ...user.toJSON(),
+                    createdAt: user.createdAt.toISOString(),
+                    token
+                }
+
             }catch(err){
                 console.log(err)
                 throw err
@@ -65,19 +95,12 @@ module.exports = {
 
                 if (password != confirmPassword) errors.confirmPassword = 'Password must match'
 
-                // // Check if user/email exists
-                // const userByUsername = await User.findOne({ where: { username }});
-                // const userByEmail = await User.findOne({ where: { email }});
-
-                // if (userByUsername) error.username = "Username is taken";
-                // if (userByEmail) error.email = "Email is taken";
-
                 if (Object.keys(errors).length  > 0){
                     throw errors;
                 };
                 // Hash pass
                 // #3 14:32 npm install bcryptjs 
-                // password = await bcrypt.hash(password, 6);
+                password = await bcrypt.hash(password, 6);
 
                 // Create User
                 const user = await User.create({
